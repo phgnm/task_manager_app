@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1045638018861",
+    "project_id": "task-scheduler-app-53a04",
+    "storage_bucket": "task-scheduler-app-53a04.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1045638018861:android:c3941b0314e124c262c5a4",
+        "android_client_info": {
+          "package_name": "com.example.taskmanager.task_manager_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7ptQUZGetfH6LYD93r5ReBiHT0IuBHTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
