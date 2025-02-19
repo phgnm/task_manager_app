@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'placeholder.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -36,9 +37,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _passwordController.text,
                 );
                 if (user != null) {
-                  // Navigate to the task screen
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => PlaceholderScreen()),
+                  );
                 } else {
-                  // Show error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Registration failed. Please try again.')),
+                  );
                 }
               },
               child: Text('Register'),

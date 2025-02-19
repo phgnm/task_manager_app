@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'placeholder.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -36,10 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   _passwordController.text,
                 );
                 if (user != null) {
-                  ;
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => PlaceholderScreen()),
+                  );
                 }
                 else {
-
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Login failed, Please try again."))
+                  );
                 }
               },
               child: Text("Login"),

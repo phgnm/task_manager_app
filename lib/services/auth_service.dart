@@ -5,7 +5,8 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   UserModel? _userFromFirebaseUser(User? user) {
-    return user != null ? UserModel(uid: user.uid, email: user.email!) : null;
+    if (user == null || user.email == null) return null;
+    return UserModel(uid: user.uid, email: user.email!);
   }
 
   // Sign in
@@ -24,16 +25,23 @@ class AuthService {
   // Sign up
   Future<UserModel?> signUp(String email, String password) async {
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       User? user = result.user;
-      return _userFromFirebaseUser(user);
+
+      print("Firebase user created: ${user?.uid}");
+      print("Email from Firebase: ${user?.email}");
+
+      UserModel? userModel = _userFromFirebaseUser(user);
+      print("UserModel created: ${userModel?.uid}");
+
+      return userModel;
     }
     catch (e) {
-      print(e.toString());
+      print("Sign up error: ${e.toString()}");
       return null;
     }
   }
-
   // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
