@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'placeholder.dart';
+import 'task_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 if (user != null) {
                   Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => PlaceholderScreen()),
+                      MaterialPageRoute(builder: (context) => TaskScreen()),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

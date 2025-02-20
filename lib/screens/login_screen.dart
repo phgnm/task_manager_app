@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'placeholder.dart';
+import 'task_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (user != null) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => PlaceholderScreen()),
+                    MaterialPageRoute(builder: (context) => TaskScreen()),
                   );
                 }
                 else {
