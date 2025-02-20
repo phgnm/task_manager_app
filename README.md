@@ -1,16 +1,13 @@
-# task_manager_app
+# Task Manager App
 
-A new Flutter project.
+A mini project made with Flutter
 
-## Getting Started
+## Introduction
 
-This project is a starting point for a Flutter application.
+This is a mini solo project by me. The main purpose is to get use to the flow of a Flutter program.
 
-A few resources to get you started if this is your first Flutter project:
+The program is under construction and is expected to include the following functions:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- An account system which is connected to Firebase
+- Functions to create, edit, and delete a task
+- Notify the user when the task is about to due
