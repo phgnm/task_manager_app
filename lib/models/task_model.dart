@@ -3,6 +3,7 @@ class TaskModel {
   final String title;
   final String description;
   final DateTime dueDate;
+  final String userID;
   final bool isCompleted;
 
   TaskModel({
@@ -10,6 +11,7 @@ class TaskModel {
     required this.title,
     required this.description,
     required this.dueDate,
+    required this.userID,
     this.isCompleted = false,
   });
 
@@ -20,6 +22,7 @@ class TaskModel {
       'title': title,
       'description': description,
       'dueDate': dueDate.toIso8601String(),
+      'userID': userID,
       'isCompleted': isCompleted,
     };
   }
@@ -31,6 +34,7 @@ class TaskModel {
       title: map['title'],
       description: map['description'],
       dueDate: DateTime.parse(map['dueDate']),
+      userID: map['userID'],
       isCompleted: map['isCompleted'] ?? false,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task_model.dart';
@@ -18,10 +19,12 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(title: Text('Tasks')),
       body: StreamBuilder<List<TaskModel>>(
-        stream: _taskService.getTasks(),
+        stream: user != null ? _taskService.getTasks(user.uid) : Stream.value([]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -123,10 +126,12 @@ class _TaskScreenState extends State<TaskScreen> {
             TextButton(
               onPressed: () {
                 if (_selectedDueDate != null) {
+                  final user = FirebaseAuth.instance.currentUser;
                   final newTask = TaskModel(
                     id: '',
                     title: _titleController.text,
                     description: _descriptionController.text,
+                    userID: user!.uid,
                     dueDate: _selectedDueDate!,
                   );
                   _taskService.addTask(newTask);
@@ -191,11 +196,13 @@ class _TaskScreenState extends State<TaskScreen> {
             TextButton(
               onPressed: () {
                 if (_selectedDueDate != null) {
+                  final user = FirebaseAuth.instance.currentUser;
                   final updatedTask = TaskModel(
                     id: task.id,
                     title: _titleController.text,
                     description: _descriptionController.text,
                     dueDate: _selectedDueDate!,
+                    userID: user!.uid,
                     isCompleted: task.isCompleted,
                   );
                   _taskService.updateTask(updatedTask);

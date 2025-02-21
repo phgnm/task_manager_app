@@ -12,10 +12,14 @@ class TaskService {
   }
 
   // Read
-  Stream<List<TaskModel>> getTasks() {
-    return _firestore.collection('tasks').snapshots().map((snapshot) {
+  Stream<List<TaskModel>> getTasks(String userID) {
+    return _firestore
+        .collection('tasks')
+        .where('userID', isEqualTo: userID)
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return TaskModel.fromMap(doc.data() as Map<String, dynamic>)
+        return TaskModel.fromMap(doc.data())
           ..id = doc.id;
       }).toList();
     });
