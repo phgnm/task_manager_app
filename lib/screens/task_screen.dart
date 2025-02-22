@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/main.dart';
 import '../models/task_model.dart';
 import '../providers/theme_provider.dart';
 import '../services/task_service.dart';
@@ -23,6 +25,29 @@ class _TaskScreenState extends State<TaskScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('Tasks')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('User Options', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(
+              title: Text('Change Password'),
+              onTap: () {
+                _showChangePasswordDialog();
+              },
+            ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: () {
+                _logout();
+              }
+            )
+          ]
+        )
+      ),
       body: StreamBuilder<List<TaskModel>>(
         stream: user != null ? _taskService.getTasks(user.uid) : Stream.value([]),
         builder: (context, snapshot) {
@@ -113,18 +138,30 @@ class _TaskScreenState extends State<TaskScreen> {
                     lastDate: DateTime(2100),
                   );
                   if (pickedDate != null) {
-                    setState(() {
-                      _selectedDueDate = pickedDate;
-                    });
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (pickedTime != null) {
+                      setState(() {
+                        _selectedDueDate = DateTime(
+                          pickedDate.year,
+                          pickedDate.month,
+                          pickedDate.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
+                      });
+                    }
                   }
                 },
-                child: Text('Select Due Date'),
+                child: Text('Select Due Date and Time'),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_selectedDueDate != null) {
                   final user = FirebaseAuth.instance.currentUser;
                   final newTask = TaskModel(
@@ -136,6 +173,8 @@ class _TaskScreenState extends State<TaskScreen> {
                   );
                   _taskService.addTask(newTask);
                   Navigator.of(context).pop();
+
+                  await _taskService.scheduleNotification(_selectedDueDate!, newTask.title, user.uid);
                 }
                 else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -219,5 +258,66 @@ class _TaskScreenState extends State<TaskScreen> {
         );
       },
     );
+  }
+
+  void _showChangePasswordDialog() {
+    final TextEditingController _oldPasswordController = TextEditingController();
+    final TextEditingController _newPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Change Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _oldPasswordController,
+                decoration: InputDecoration(labelText: 'Old Password'),
+                obscureText: true,
+              ),
+              TextField(
+                controller: _newPasswordController,
+                decoration: InputDecoration(labelText: 'New Password'),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser;
+
+                if (user != null) {
+                  try {
+                    AuthCredential credential = EmailAuthProvider.credential(
+                      email: user.email!,
+                      password: _oldPasswordController.text,
+                    );
+
+                    await user.reauthenticateWithCredential(credential);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
+                  }
+                  catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change password: ${e.toString()}')));
+                  }
+                }
+              },
+              child: Text('Change'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userID');
+    await flutterLocalNotificationsPlugin.cancelAll();
+    Navigator.of(context).pushReplacementNamed('/');
   }
 }
