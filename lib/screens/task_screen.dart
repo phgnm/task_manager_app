@@ -116,48 +116,52 @@ class _TaskScreenState extends State<TaskScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text('Add Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
-              ),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description')
-              ),
-              SizedBox(height: 16),
-              Text('Due Date: ${_selectedDueDate != null ? _selectedDueDate!.toLocal().toString().split(' ')[0] : 'Not selected'}'),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    TimeOfDay? pickedTime = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (pickedTime != null) {
-                      setState(() {
-                        _selectedDueDate = DateTime(
-                          pickedDate.year,
-                          pickedDate.month,
-                          pickedDate.day,
-                          pickedTime.hour,
-                          pickedTime.minute,
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(labelText: 'Title'),
+                  ),
+                  TextField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(labelText: 'Description')
+                  ),
+                  SizedBox(height: 16),
+                  Text('Due Date: ${_selectedDueDate != null ? _formatDateTime(_selectedDueDate!) : 'Not selected'}'),
+                  ElevatedButton(
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
                         );
-                      });
-                    }
-                  }
-                },
-                child: Text('Select Due Date and Time'),
-              ),
-            ],
+                        if (pickedTime != null) {
+                          setState(() {
+                            _selectedDueDate = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                            );
+                          });
+                        }
+                      }
+                    },
+                    child: Text('Select Due Date and Time'),
+                  ),
+                ],
+              );
+            }
           ),
           actions: [
             TextButton(
@@ -200,36 +204,52 @@ class _TaskScreenState extends State<TaskScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text('Update Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(labelText: 'Title'),
-              ),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
-              ),
-              SizedBox(height: 16),
-              Text('Due Date: ${_selectedDueDate != null ? _selectedDueDate!.toLocal().toString().split(' ')[0] : 'Not selected'}'),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDueDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedDueDate = pickedDate;
-                    });
-                  }
-                },
-                child: Text('Select Due Date'),
-              ),
-            ],
+          content: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _titleController,
+                      decoration: InputDecoration(labelText: 'Title'),
+                    ),
+                    TextField(
+                        controller: _descriptionController,
+                        decoration: InputDecoration(labelText: 'Description')
+                    ),
+                    SizedBox(height: 16),
+                    Text('Due Date: ${_selectedDueDate != null ? _formatDateTime(_selectedDueDate!) : 'Not selected'}'),
+                    ElevatedButton(
+                      onPressed: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2100),
+                        );
+                        if (pickedDate != null) {
+                          TimeOfDay? pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (pickedTime != null) {
+                            setState(() {
+                              _selectedDueDate = DateTime(
+                                pickedDate.year,
+                                pickedDate.month,
+                                pickedDate.day,
+                                pickedTime.hour,
+                                pickedTime.minute,
+                              );
+                            });
+                          }
+                        }
+                      },
+                      child: Text('Select Due Date and Time'),
+                    ),
+                  ],
+                );
+              }
           ),
           actions: [
             TextButton(
@@ -319,5 +339,10 @@ class _TaskScreenState extends State<TaskScreen> {
     await prefs.remove('userID');
     await flutterLocalNotificationsPlugin.cancelAll();
     Navigator.of(context).pushReplacementNamed('/');
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} '
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 }
