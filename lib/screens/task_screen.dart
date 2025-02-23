@@ -338,7 +338,7 @@ class _TaskScreenState extends State<TaskScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userID');
     await flutterLocalNotificationsPlugin.cancelAll();
-    Navigator.of(context).pushReplacementNamed('/');
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   String _formatDateTime(DateTime dateTime) {

@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => userID != null ? TaskScreen() : LoginScreen(),
+        '/login': (context) => LoginScreen(),
         '/signup': (context) => SignUpScreen(),
       },
     );
