@@ -317,6 +317,8 @@ class _TaskScreenState extends State<TaskScreen> {
                     );
 
                     await user.reauthenticateWithCredential(credential);
+
+                    await user.updatePassword(_newPasswordController.text);
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password changed successfully!')));
                   }
