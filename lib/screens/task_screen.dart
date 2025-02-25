@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:task_manager_app/main.dart';
 import '../models/task_model.dart';
 import '../providers/theme_provider.dart';
 import '../services/task_service.dart';
+import '../services/notif_service.dart';
 
 class TaskScreen extends StatefulWidget {
   @override
@@ -166,19 +166,37 @@ class _TaskScreenState extends State<TaskScreen> {
           actions: [
             TextButton(
               onPressed: () async {
-                if (_selectedDueDate != null) {
+                final selectedDueDate = _selectedDueDate;
+                if (selectedDueDate != null) {
                   final user = FirebaseAuth.instance.currentUser;
                   final newTask = TaskModel(
                     id: '',
                     title: _titleController.text,
                     description: _descriptionController.text,
                     userID: user!.uid,
-                    dueDate: _selectedDueDate!,
+                    dueDate: selectedDueDate,
                   );
-                  _taskService.addTask(newTask);
+                  String taskID = await _taskService.addTask(newTask);
                   Navigator.of(context).pop();
 
-                  await _taskService.scheduleNotification(_selectedDueDate!, newTask.title, user.uid);
+                  int notificationID;
+                  try {
+                    notificationID = taskID.hashCode % 2147483647;
+                  }
+                  catch(e) {
+                    notificationID = DateTime.now().millisecondsSinceEpoch % 2147483647;
+                  }
+
+                  NotiService().scheduleNotification(
+                    id: notificationID,
+                    title: "Task reminder",
+                    body: "Your task ${_titleController.text} is due",
+                    year: selectedDueDate.year,
+                    month: selectedDueDate.month,
+                    day: selectedDueDate.day,
+                    hour: selectedDueDate.hour,
+                    minute: selectedDueDate.minute,
+                  );
                 }
                 else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -266,6 +284,19 @@ class _TaskScreenState extends State<TaskScreen> {
                   );
                   _taskService.updateTask(updatedTask);
                   Navigator.of(context).pop();
+
+                  NotiService().cancelNotification(task.id.hashCode % 2147483647);
+
+                  NotiService().scheduleNotification(
+                    id: task.id.hashCode % 2147483647, // Use task ID as notification ID
+                    title: "Task reminder",
+                    body: "Your task ${_titleController.text} is due",
+                    year: _selectedDueDate!.year,
+                    month: _selectedDueDate!.month,
+                    day: _selectedDueDate!.day,
+                    hour: _selectedDueDate!.hour,
+                    minute: _selectedDueDate!.minute,
+                  );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Please select a due date.')),
@@ -337,7 +368,7 @@ class _TaskScreenState extends State<TaskScreen> {
     await FirebaseAuth.instance.signOut();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('userID');
-    await flutterLocalNotificationsPlugin.cancelAll();
+    await NotiService().cancelAllNotifications();
     Navigator.of(context).pushReplacementNamed('/login');
   }
 

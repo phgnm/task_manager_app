@@ -4,23 +4,16 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager_app/screens/task_screen.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:task_manager_app/services/notif_service.dart';
 import 'providers/theme_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Init timezone
-  tz.initializeTimeZones();
-
   // Init notif
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  final InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await NotiService().initNotification();
 
   // Init firebase
   await Firebase.initializeApp();
